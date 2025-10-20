@@ -88,7 +88,7 @@ class DataParser {
         // Determine grid type based on column (odd = mainline, even = aux)
         const colNum = parseInt(column.replace('C-', ''));
         const isMainline = colNum % 2 === 1;
-        const gridType = isMainline ? 'MAINLINE' : 'AUX';
+        const gridType = isMainline ? 'Mainline (HORIZONTAL)' : 'Aux (VERTICAL)';
 
         // Panel and row definitions separated by grid type
         const panels = {

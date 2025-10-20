@@ -165,13 +165,19 @@ function setupVoiceRecognition() {
 
                 console.log('Parsed hold number:', holdNumber);
 
-                // Update input and trigger search
-                const searchInput = document.getElementById('hold-search');
-                searchInput.value = holdNumber;
-                handleSearch();
+                // Check if hold exists before updating input
+                const holdInfo = dataParser.findHold(holdNumber);
+                if (holdInfo) {
+                    // Update input and trigger search
+                    const searchInput = document.getElementById('hold-search');
+                    searchInput.value = holdNumber;
+                    handleSearch();
 
-                // If hold was found, speak the information
-                speakHoldInfo(holdNumber);
+                    // Speak the information
+                    speakHoldInfo(holdNumber);
+                } else {
+                    console.log('Hold not found, ignoring:', holdNumber);
+                }
             }
         }
     };

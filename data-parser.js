@@ -83,4 +83,31 @@ class DataParser {
     getAllHolds() {
         return Object.keys(this.holdLookup);
     }
+
+    getRelativePosition(row, column) {
+        // Panel structure:
+        // Top panel (9 rows): R-35, R-34, R-33, R-32, R-31, R-30, R-29, R-28, R-27
+        // Middle panel (10 rows): R-26, R-25, R-24, R-23, R-22, R-21, R-20, R-19, R-18, R-17
+        // Bottom panel (10 rows): R-16, R-15, R-14, R-13, R-12, R-11, R-10, R-9, R-8, R-7
+
+        const rowMapping = {
+            // Top panel
+            'R-35': 'R1', 'R-34': 'R2', 'R-33': 'R3', 'R-32': 'R4', 'R-31': 'R5',
+            'R-30': 'R6', 'R-29': 'R7', 'R-28': 'R8', 'R-27': 'R9',
+            // Middle panel
+            'R-26': 'R1', 'R-25': 'R2', 'R-24': 'R3', 'R-23': 'R4', 'R-22': 'R5',
+            'R-21': 'R6', 'R-20': 'R7', 'R-19': 'R8', 'R-18': 'R9', 'R-17': 'R10',
+            // Bottom panel
+            'R-16': 'R1', 'R-15': 'R2', 'R-14': 'R3', 'R-13': 'R4', 'R-12': 'R5',
+            'R-11': 'R6', 'R-10': 'R7', 'R-9': 'R8', 'R-8': 'R9', 'R-7': 'R10'
+        };
+
+        // Extract column number (C-1 -> C1, C-2 -> C2, etc.)
+        const colNumber = column.replace('C-', 'C');
+
+        return {
+            row: rowMapping[row] || row,
+            column: colNumber
+        };
+    }
 }

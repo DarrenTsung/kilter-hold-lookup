@@ -73,8 +73,11 @@ function displayHoldInfo(holdInfo) {
     const angleDisplay = document.getElementById('angle-display');
     const positionDisplay = document.getElementById('position-display');
 
+    // Get relative position within the panel
+    const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
+
     angleDisplay.textContent = `Angle: ${holdInfo.angle}`;
-    positionDisplay.textContent = `Position: ${holdInfo.row}, ${holdInfo.column}`;
+    positionDisplay.textContent = `Position: ${relativePos.column}, ${relativePos.row}`;
 }
 
 function showError(message) {

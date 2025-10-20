@@ -5,6 +5,21 @@ let renderer;
 
 // Voice recognition and speech synthesis
 let recognition = null;
+let voices = [];
+
+// Load voices
+function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+    console.log('Loaded voices:', voices.length);
+}
+
+// Wait for voices to load
+if (window.speechSynthesis) {
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
 
 function speakHoldInfo(holdNumber) {
     // Check if hold exists
@@ -40,14 +55,22 @@ function speakHoldInfo(holdNumber) {
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.rate = 0.9; // Slightly slower for clarity
+
+        // Set voice if available
+        if (voices.length > 0) {
+            utterance.voice = voices[0]; // Use first available voice
+        }
+
+        utterance.rate = 0.9;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
-        console.log('Speaking:', textToSpeak);
+        // Add event listeners for debugging
+        utterance.addEventListener('start', (e) => {
+            console.log('Speech started');
+        });
 
-        // Restart recognition after speaking
-        utterance.onend = () => {
+        utterance.addEventListener('end', (e) => {
             console.log('Speech finished, restarting recognition');
             if (recognition) {
                 setTimeout(() => {
@@ -58,8 +81,13 @@ function speakHoldInfo(holdNumber) {
                     }
                 }, 500);
             }
-        };
+        });
 
+        utterance.addEventListener('error', (e) => {
+            console.error('Speech error:', e);
+        });
+
+        console.log('Speaking:', textToSpeak);
         window.speechSynthesis.speak(utterance);
     } else {
         console.log('Speech synthesis not supported');
@@ -167,7 +195,7 @@ async function init() {
         handleSearch();
 
         // Set up voice recognition
-        setupVoiceRecognition();
+        // setupVoiceRecognition();
 
         console.log('Application initialized successfully');
     } catch (error) {
@@ -191,9 +219,30 @@ function setupEventListeners() {
     testSpeechBtn.addEventListener('click', () => {
         const testText = 'Speech test. Panel TOP. Grid Mainline. Column 1 from the LEFT. Row 1 from the TOP.';
         const utterance = new SpeechSynthesisUtterance(testText);
+
+        // Set voice if available
+        if (voices.length > 0) {
+            utterance.voice = voices[0];
+            console.log('Using voice:', voices[0].name);
+        }
+
         utterance.rate = 0.9;
         utterance.volume = 1.0;
+
+        utterance.addEventListener('start', () => {
+            console.log('Test speech started');
+        });
+
+        utterance.addEventListener('end', () => {
+            console.log('Test speech ended');
+        });
+
+        utterance.addEventListener('error', (e) => {
+            console.error('Test speech error:', e);
+        });
+
         console.log('Testing speech:', testText);
+        console.log('Available voices:', voices.length);
         window.speechSynthesis.speak(utterance);
     });
 

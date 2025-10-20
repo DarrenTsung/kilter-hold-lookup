@@ -97,12 +97,21 @@ function showError(message) {
 }
 
 function clearDisplay() {
-    document.getElementById('panel-display').textContent = '';
-    document.getElementById('grid-display').textContent = '';
-    document.getElementById('column-display').textContent = '';
-    document.getElementById('row-display').textContent = '';
-    document.getElementById('angle-display').textContent = '';
-    document.getElementById('error-message').textContent = '';
+    const elements = [
+        'panel-display',
+        'grid-display',
+        'column-display',
+        'row-display',
+        'angle-display',
+        'error-message'
+    ];
+
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = '';
+        }
+    });
 }
 
 function clearSearch() {

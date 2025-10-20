@@ -94,10 +94,13 @@ class WallRenderer {
 
         // Draw row highlight (horizontal line)
         this.drawRowHighlight(x, y);
+
+        // Draw circle at intersection
+        this.drawIntersectionCircle(x, y);
     }
 
     drawColumnHighlight(x, y) {
-        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.4)'; // Yellow at 40% opacity
+        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.5)'; // Yellow at 50% opacity
         this.ctx.lineWidth = 30;
 
         // Draw vertical line with circular cutout at intersection
@@ -119,7 +122,7 @@ class WallRenderer {
     }
 
     drawRowHighlight(x, y) {
-        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.4)'; // Blue at 40% opacity
+        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue at 50% opacity
         this.ctx.lineWidth = 30;
 
         // Draw horizontal line with circular cutout at intersection
@@ -138,6 +141,16 @@ class WallRenderer {
         this.ctx.stroke();
 
         this.ctx.restore();
+    }
+
+    drawIntersectionCircle(x, y) {
+        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue at 50% opacity
+        this.ctx.lineWidth = 30;
+
+        // Draw circle just outside the cutout (35px radius + half line width)
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 35, 0, Math.PI * 2);
+        this.ctx.stroke();
     }
 
     drawHoldMarker(x, y) {

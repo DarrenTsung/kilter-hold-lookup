@@ -110,13 +110,13 @@ class DataParser {
         let relativeRowNumber = 0;
 
         if (gridPanels.top.includes(row)) {
-            panel = 'Top';
+            panel = 'TOP';
             relativeRowNumber = gridPanels.top.indexOf(row) + 1;
         } else if (gridPanels.middle.includes(row)) {
-            panel = 'Middle';
+            panel = 'MIDDLE';
             relativeRowNumber = gridPanels.middle.indexOf(row) + 1;
         } else if (gridPanels.bottom.includes(row)) {
-            panel = 'Bottom';
+            panel = 'BOTTOM';
             relativeRowNumber = gridPanels.bottom.indexOf(row) + 1;
         }
 
@@ -140,15 +140,15 @@ class DataParser {
         // Use the smaller number
         let columnText;
         if (fromLeft <= fromRight) {
-            columnText = `${fromLeft} from the left`;
+            columnText = `${fromLeft} from the LEFT`;
         } else {
-            columnText = `${fromRight} from the right`;
+            columnText = `${fromRight} from the RIGHT`;
         }
 
         return {
             panel: panel,
             gridType: gridType,
-            rowText: `${relativeRowNumber} from the top`,
+            rowText: `${relativeRowNumber} from the TOP`,
             columnText: columnText
         };
     }

@@ -76,14 +76,16 @@ function handleSearch() {
 
 function displayHoldInfo(holdInfo) {
     const panelDisplay = document.getElementById('panel-display');
-    const positionDisplay = document.getElementById('position-display');
+    const columnDisplay = document.getElementById('column-display');
+    const rowDisplay = document.getElementById('row-display');
     const angleDisplay = document.getElementById('angle-display');
 
     // Get relative position within the panel
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
     panelDisplay.textContent = `Panel: ${relativePos.panel}`;
-    positionDisplay.textContent = `Position: ${relativePos.column}, ${relativePos.row}`;
+    columnDisplay.textContent = `Column: ${relativePos.columnText}`;
+    rowDisplay.textContent = `Row: ${relativePos.rowText}`;
     angleDisplay.textContent = `Angle: ${holdInfo.angle}`;
 }
 
@@ -94,7 +96,8 @@ function showError(message) {
 
 function clearDisplay() {
     document.getElementById('panel-display').textContent = '';
-    document.getElementById('position-display').textContent = '';
+    document.getElementById('column-display').textContent = '';
+    document.getElementById('row-display').textContent = '';
     document.getElementById('angle-display').textContent = '';
     document.getElementById('error-message').textContent = '';
 }

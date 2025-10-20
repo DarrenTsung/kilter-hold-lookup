@@ -95,26 +95,37 @@ class DataParser {
         const bottomPanel = ['R-16', 'R-15', 'R-14', 'R-13', 'R-12', 'R-11', 'R-10', 'R-9', 'R-8', 'R-7'];
 
         let panel = '';
-        let relativeRow = '';
+        let relativeRowNumber = 0;
 
         if (topPanel.includes(row)) {
             panel = 'Top';
-            relativeRow = 'R' + (topPanel.indexOf(row) + 1);
+            relativeRowNumber = topPanel.indexOf(row) + 1;
         } else if (middlePanel.includes(row)) {
             panel = 'Middle';
-            relativeRow = 'R' + (middlePanel.indexOf(row) + 1);
+            relativeRowNumber = middlePanel.indexOf(row) + 1;
         } else if (bottomPanel.includes(row)) {
             panel = 'Bottom';
-            relativeRow = 'R' + (bottomPanel.indexOf(row) + 1);
+            relativeRowNumber = bottomPanel.indexOf(row) + 1;
         }
 
-        // Extract column number (C-1 -> C1, C-2 -> C2, etc.)
-        const colNumber = column.replace('C-', 'C');
+        // Calculate column position (C-1 -> 1, C-2 -> 2, etc.)
+        const colNum = parseInt(column.replace('C-', ''));
+        const totalColumns = 21;
+        const fromLeft = colNum;
+        const fromRight = totalColumns - colNum + 1;
+
+        // Use the smaller number
+        let columnText;
+        if (fromLeft <= fromRight) {
+            columnText = `${fromLeft} from the left`;
+        } else {
+            columnText = `${fromRight} from the right`;
+        }
 
         return {
             panel: panel,
-            row: relativeRow,
-            column: colNumber
+            rowText: `${relativeRowNumber} from the top`,
+            columnText: columnText
         };
     }
 }

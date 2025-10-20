@@ -90,38 +90,57 @@ class WallRenderer {
         }
 
         // Draw column highlight (vertical line)
-        this.drawColumnHighlight(x);
+        this.drawColumnHighlight(x, y);
 
         // Draw row highlight (horizontal line)
-        this.drawRowHighlight(y);
+        this.drawRowHighlight(x, y);
 
         // Draw hold position marker
         this.drawHoldMarker(x, y);
-
-        // Draw labels
-        this.drawLabels(holdInfo.column, holdInfo.row, x, y);
     }
 
-    drawColumnHighlight(x) {
-        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.5)'; // Yellow
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([10, 5]);
+    drawColumnHighlight(x, y) {
+        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.3)'; // Yellow at 30% opacity
+        this.ctx.lineWidth = 8;
+
+        // Draw vertical line with circular cutout at intersection
+        this.ctx.save();
+
+        // Create clipping path that excludes a circle at the intersection
+        this.ctx.beginPath();
+        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
+        this.ctx.clip();
+
+        // Draw the line
         this.ctx.beginPath();
         this.ctx.moveTo(x, 0);
         this.ctx.lineTo(x, this.canvas.height);
         this.ctx.stroke();
-        this.ctx.setLineDash([]);
+
+        this.ctx.restore();
     }
 
-    drawRowHighlight(y) {
-        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([10, 5]);
+    drawRowHighlight(x, y) {
+        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.3)'; // Blue at 30% opacity
+        this.ctx.lineWidth = 8;
+
+        // Draw horizontal line with circular cutout at intersection
+        this.ctx.save();
+
+        // Create clipping path that excludes a circle at the intersection
+        this.ctx.beginPath();
+        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
+        this.ctx.clip();
+
+        // Draw the line
         this.ctx.beginPath();
         this.ctx.moveTo(0, y);
         this.ctx.lineTo(this.canvas.width, y);
         this.ctx.stroke();
-        this.ctx.setLineDash([]);
+
+        this.ctx.restore();
     }
 
     drawHoldMarker(x, y) {
@@ -141,25 +160,6 @@ class WallRenderer {
         this.ctx.beginPath();
         this.ctx.arc(x, y, 8, 0, Math.PI * 2);
         this.ctx.fill();
-    }
-
-    drawLabels(column, row, x, y) {
-        this.ctx.shadowBlur = 0;
-        this.ctx.font = 'bold 24px sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-
-        // Column label at top
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(x - 40, 10, 80, 40);
-        this.ctx.fillStyle = '#FFEB3B';
-        this.ctx.fillText(column, x, 30);
-
-        // Row label at left
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(10, y - 20, 80, 40);
-        this.ctx.fillStyle = '#2196F3';
-        this.ctx.fillText(row, 50, y);
     }
 
     clear() {

@@ -179,12 +179,23 @@ async function init() {
 function setupEventListeners() {
     const searchInput = document.getElementById('hold-search');
     const clearBtn = document.getElementById('clear-btn');
+    const testSpeechBtn = document.getElementById('test-speech-btn');
 
     // Search on input
     searchInput.addEventListener('input', handleSearch);
 
     // Clear button
     clearBtn.addEventListener('click', clearSearch);
+
+    // Test speech button
+    testSpeechBtn.addEventListener('click', () => {
+        const testText = 'Speech test. Panel TOP. Grid Mainline. Column 1 from the LEFT. Row 1 from the TOP.';
+        const utterance = new SpeechSynthesisUtterance(testText);
+        utterance.rate = 0.9;
+        utterance.volume = 1.0;
+        console.log('Testing speech:', testText);
+        window.speechSynthesis.speak(utterance);
+    });
 
     // Enter key
     searchInput.addEventListener('keypress', (e) => {

@@ -147,9 +147,10 @@ class WallRenderer {
         this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue at 50% opacity
         this.ctx.lineWidth = 30;
 
-        // Draw circle just outside the cutout (35px radius + half line width)
+        // Draw circle just outside the cutout and line width
+        // Cutout radius (35) + line half-width (15) + circle half-width (15) = 65
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 35, 0, Math.PI * 2);
+        this.ctx.arc(x, y, 65, 0, Math.PI * 2);
         this.ctx.stroke();
     }
 

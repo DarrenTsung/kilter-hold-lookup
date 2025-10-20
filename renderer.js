@@ -34,14 +34,32 @@ class WallRenderer {
     }
 
     calculateGridMapping() {
-        const width = this.canvas.width;
         const height = this.canvas.height;
 
-        // Define all columns (both odd and even)
-        const allColumns = [
-            'C-1', 'C-2', 'C-3', 'C-4', 'C-5', 'C-6', 'C-7', 'C-8', 'C-9', 'C-10',
-            'C-11', 'C-12', 'C-13', 'C-14', 'C-15', 'C-16', 'C-17', 'C-18', 'C-19', 'C-20', 'C-21'
-        ];
+        // Actual pixel measurements for columns (X coordinates at top and bottom of image)
+        const columnPixels = {
+            'C-1':  { top: 40,  bottom: 24 },
+            'C-2':  { top: 77,  bottom: 65 },
+            'C-3':  { top: 117, bottom: 105 },
+            'C-4':  { top: 157, bottom: 148 },
+            'C-5':  { top: 195, bottom: 188 },
+            'C-6':  { top: 235, bottom: 228 },
+            'C-7':  { top: 272, bottom: 270 },
+            'C-8':  { top: 312, bottom: 310 },
+            'C-9':  { top: 350, bottom: 351 },
+            'C-10': { top: 389, bottom: 392 },
+            'C-11': { top: 428, bottom: 430 },
+            'C-12': { top: 468, bottom: 472 },
+            'C-13': { top: 506, bottom: 512 },
+            'C-14': { top: 545, bottom: 553 },
+            'C-15': { top: 585, bottom: 596 },
+            'C-16': { top: 626, bottom: 636 },
+            'C-17': { top: 663, bottom: 679 },
+            'C-18': { top: 704, bottom: 720 },
+            'C-19': { top: 742, bottom: 760 },
+            'C-20': { top: 783, bottom: 803 },
+            'C-21': { top: 822, bottom: 846 }
+        };
 
         // Define all rows (both grids interleaved)
         const allRows = [
@@ -50,24 +68,30 @@ class WallRenderer {
             'R-15', 'R-14', 'R-13', 'R-12', 'R-11', 'R-10', 'R-9', 'R-8', 'R-7'
         ];
 
-        // Calculate spacing
-        const columnSpacing = width / (allColumns.length + 1);
+        // Calculate row Y positions (evenly distributed)
         const rowSpacing = height / (allRows.length + 1);
 
         this.gridMapping = {
-            columns: {},
+            columnPixels: columnPixels,
             rows: {}
         };
-
-        // Map columns to x coordinates
-        allColumns.forEach((col, index) => {
-            this.gridMapping.columns[col] = (index + 1) * columnSpacing;
-        });
 
         // Map rows to y coordinates
         allRows.forEach((row, index) => {
             this.gridMapping.rows[row] = (index + 1) * rowSpacing;
         });
+    }
+
+    getColumnXPosition(column, y) {
+        // Interpolate X position based on Y using the column's top and bottom measurements
+        const colData = this.gridMapping.columnPixels[column];
+        if (!colData) return null;
+
+        const height = this.canvas.height;
+        const t = y / height; // Normalized position from top (0) to bottom (1)
+
+        // Linear interpolation between top and bottom X coordinates
+        return colData.top + t * (colData.bottom - colData.top);
     }
 
     drawImage() {
@@ -81,16 +105,21 @@ class WallRenderer {
 
         if (!holdInfo || !this.gridMapping) return;
 
-        const x = this.gridMapping.columns[holdInfo.column];
         const y = this.gridMapping.rows[holdInfo.row];
+        if (!y) {
+            console.error('Invalid row:', holdInfo.row);
+            return;
+        }
 
-        if (!x || !y) {
-            console.error('Invalid grid position:', holdInfo);
+        // Get interpolated X position for this column at this Y position
+        const x = this.getColumnXPosition(holdInfo.column, y);
+        if (!x) {
+            console.error('Invalid column:', holdInfo.column);
             return;
         }
 
         // Draw column highlight (vertical line)
-        this.drawColumnHighlight(x, y);
+        this.drawColumnHighlight(x, y, holdInfo.column);
 
         // Draw row highlight (horizontal line)
         this.drawRowHighlight(x, y);
@@ -99,11 +128,11 @@ class WallRenderer {
         this.drawIntersectionCircle(x, y);
     }
 
-    drawColumnHighlight(x, y) {
+    drawColumnHighlight(x, y, column) {
         this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.5)'; // Yellow at 50% opacity
         this.ctx.lineWidth = 30;
 
-        // Draw vertical line with circular cutout at intersection
+        // Draw curved column line with circular cutout at intersection
         this.ctx.save();
 
         // Create clipping path that excludes a circle at the intersection
@@ -112,10 +141,18 @@ class WallRenderer {
         this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
         this.ctx.clip();
 
-        // Draw the line
+        // Draw the curved line by sampling points along the height
+        const steps = 50;
         this.ctx.beginPath();
-        this.ctx.moveTo(x, 0);
-        this.ctx.lineTo(x, this.canvas.height);
+        for (let i = 0; i <= steps; i++) {
+            const currentY = (i / steps) * this.canvas.height;
+            const currentX = this.getColumnXPosition(column, currentY);
+            if (i === 0) {
+                this.ctx.moveTo(currentX, currentY);
+            } else {
+                this.ctx.lineTo(currentX, currentY);
+            }
+        }
         this.ctx.stroke();
 
         this.ctx.restore();

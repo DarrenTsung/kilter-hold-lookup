@@ -11,6 +11,28 @@ let voices = [];
 function loadVoices() {
     voices = window.speechSynthesis.getVoices();
     console.log('Loaded voices:', voices.length);
+    if (voices.length > 0) {
+        console.log('First voice:', voices[0].name, voices[0].lang);
+        // Log English voices
+        const englishVoices = voices.filter(v => v.lang.startsWith('en-'));
+        console.log('English voices available:', englishVoices.length);
+    }
+}
+
+// Get preferred English voice
+function getPreferredVoice() {
+    // Try to find an English voice
+    const englishVoice = voices.find(v => v.lang.startsWith('en-'));
+    if (englishVoice) {
+        return englishVoice;
+    }
+
+    // Fall back to first voice
+    if (voices.length > 0) {
+        return voices[0];
+    }
+
+    return null;
 }
 
 // Wait for voices to load
@@ -46,19 +68,18 @@ function speakHoldInfo(holdNumber) {
 
     // Use Web Speech Synthesis API
     if ('speechSynthesis' in window) {
-        // Stop recognition while speaking to avoid interference
-        if (recognition) {
-            recognition.stop();
-        }
-
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
-        // Set voice if available
-        if (voices.length > 0) {
-            utterance.voice = voices[0]; // Use first available voice
+        // Set preferred voice
+        const voice = getPreferredVoice();
+        if (voice) {
+            utterance.voice = voice;
+            console.log('Using voice:', voice.name, voice.lang);
+        } else {
+            console.warn('No voice available for speech');
         }
 
         utterance.rate = 0.9;
@@ -71,16 +92,7 @@ function speakHoldInfo(holdNumber) {
         });
 
         utterance.addEventListener('end', (e) => {
-            console.log('Speech finished, restarting recognition');
-            if (recognition) {
-                setTimeout(() => {
-                    try {
-                        recognition.start();
-                    } catch (e) {
-                        console.log('Recognition restart failed:', e);
-                    }
-                }, 500);
-            }
+            console.log('Speech finished');
         });
 
         utterance.addEventListener('error', (e) => {
@@ -195,7 +207,7 @@ async function init() {
         handleSearch();
 
         // Set up voice recognition
-        // setupVoiceRecognition();
+        setupVoiceRecognition();
 
         console.log('Application initialized successfully');
     } catch (error) {
@@ -220,10 +232,13 @@ function setupEventListeners() {
         const testText = 'Speech test. Panel TOP. Grid Mainline. Column 1 from the LEFT. Row 1 from the TOP.';
         const utterance = new SpeechSynthesisUtterance(testText);
 
-        // Set voice if available
-        if (voices.length > 0) {
-            utterance.voice = voices[0];
-            console.log('Using voice:', voices[0].name);
+        // Set preferred voice
+        const voice = getPreferredVoice();
+        if (voice) {
+            utterance.voice = voice;
+            console.log('Using voice:', voice.name, voice.lang);
+        } else {
+            console.warn('No voice available for test speech');
         }
 
         utterance.rate = 0.9;

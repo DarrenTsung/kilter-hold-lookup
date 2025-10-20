@@ -34,8 +34,6 @@ class WallRenderer {
     }
 
     calculateGridMapping() {
-        const height = this.canvas.height;
-
         // Actual pixel measurements for columns (X coordinates at top and bottom of image)
         const columnPixels = {
             'C-1':  { top: 40,  bottom: 24 },
@@ -61,6 +59,9 @@ class WallRenderer {
             'C-21': { top: 822, bottom: 846 }
         };
 
+        // Actual pixel measurements for rows (Y coordinates, from top to bottom)
+        const rowPixels = [52, 89, 126, 167, 204, 242, 279, 321, 356, 394, 433, 472, 510, 550, 594, 629, 672, 714, 754, 789, 834, 876, 915, 954, 997, 1040, 1081, 1124, 1164];
+
         // Define all rows (both grids interleaved)
         const allRows = [
             'R-35', 'R-34', 'R-33', 'R-32', 'R-31', 'R-30', 'R-29', 'R-28', 'R-27', 'R-26',
@@ -68,17 +69,14 @@ class WallRenderer {
             'R-15', 'R-14', 'R-13', 'R-12', 'R-11', 'R-10', 'R-9', 'R-8', 'R-7'
         ];
 
-        // Calculate row Y positions (evenly distributed)
-        const rowSpacing = height / (allRows.length + 1);
-
         this.gridMapping = {
             columnPixels: columnPixels,
             rows: {}
         };
 
-        // Map rows to y coordinates
+        // Map rows to actual measured y coordinates
         allRows.forEach((row, index) => {
-            this.gridMapping.rows[row] = (index + 1) * rowSpacing;
+            this.gridMapping.rows[row] = rowPixels[index];
         });
     }
 

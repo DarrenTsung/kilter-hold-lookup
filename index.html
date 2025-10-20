@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kilter Homewall 7x10 Hold Lookup</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kilter Homewall 7x10 Hold Lookup</h1>
+        </header>
+
+        <div class="search-section">
+            <div class="search-container">
+                <label for="hold-search">Hold Number:</label>
+                <input
+                    type="text"
+                    id="hold-search"
+                    placeholder="e.g., 1143, D226"
+                    autocomplete="off"
+                />
+                <button id="clear-btn">Clear</button>
+            </div>
+
+            <div class="info-display">
+                <div id="angle-display" class="info-item"></div>
+                <div id="position-display" class="info-item"></div>
+                <div id="error-message" class="error"></div>
+            </div>
+        </div>
+
+        <div class="wall-container">
+            <canvas id="wall-canvas"></canvas>
+            <img id="wall-image" src="zoomed_colored_7x10homewall.png" alt="Kilter Wall" style="display: none;">
+        </div>
+    </div>
+
+    <script src="data-parser.js"></script>
+    <script src="renderer.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -128,7 +128,7 @@ class WallRenderer {
 
     drawColumnHighlight(x, y, column) {
         this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.5)'; // Yellow at 50% opacity
-        this.ctx.lineWidth = 30;
+        this.ctx.lineWidth = 90;
 
         // Draw curved column line with circular cutout at intersection
         this.ctx.save();
@@ -136,7 +136,7 @@ class WallRenderer {
         // Create clipping path that excludes a circle at the intersection
         this.ctx.beginPath();
         this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
+        this.ctx.arc(x, y, 60, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
         this.ctx.clip();
 
         // Draw the curved line by sampling points along the height
@@ -158,7 +158,7 @@ class WallRenderer {
 
     drawRowHighlight(x, y) {
         this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue at 50% opacity
-        this.ctx.lineWidth = 30;
+        this.ctx.lineWidth = 90;
 
         // Draw horizontal line with circular cutout at intersection
         this.ctx.save();
@@ -166,7 +166,7 @@ class WallRenderer {
         // Create clipping path that excludes a circle at the intersection
         this.ctx.beginPath();
         this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
+        this.ctx.arc(x, y, 60, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
         this.ctx.clip();
 
         // Draw the line
@@ -180,12 +180,12 @@ class WallRenderer {
 
     drawIntersectionCircle(x, y) {
         this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)'; // Blue at 50% opacity
-        this.ctx.lineWidth = 30;
+        this.ctx.lineWidth = 100;
 
         // Draw circle just outside the cutout and line width
         // Cutout radius (35) + line half-width (15) + circle half-width (15) = 65
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 65, 0, Math.PI * 2);
+        this.ctx.arc(x, y, 110, 0, Math.PI * 2);
         this.ctx.stroke();
     }
 

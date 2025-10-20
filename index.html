@@ -8,33 +8,31 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Kilter Homewall 7x10 Hold Lookup</h1>
-        </header>
+        <div class="main-content">
+            <div class="search-section">
+                <div class="search-container">
+                    <label for="hold-search">Hold Number:</label>
+                    <input
+                        type="text"
+                        id="hold-search"
+                        placeholder="e.g., 1143, D226"
+                        autocomplete="off"
+                    />
+                    <button id="clear-btn">Clear</button>
+                </div>
 
-        <div class="search-section">
-            <div class="search-container">
-                <label for="hold-search">Hold Number:</label>
-                <input
-                    type="text"
-                    id="hold-search"
-                    placeholder="e.g., 1143, D226"
-                    autocomplete="off"
-                />
-                <button id="clear-btn">Clear</button>
+                <div class="info-display">
+                    <div id="panel-display" class="info-item"></div>
+                    <div id="position-display" class="info-item"></div>
+                    <div id="angle-display" class="info-item"></div>
+                    <div id="error-message" class="error"></div>
+                </div>
             </div>
 
-            <div class="info-display">
-                <div id="panel-display" class="info-item"></div>
-                <div id="position-display" class="info-item"></div>
-                <div id="angle-display" class="info-item"></div>
-                <div id="error-message" class="error"></div>
+            <div class="wall-container">
+                <canvas id="wall-canvas"></canvas>
+                <img id="wall-image" src="zoomed_colored_7x10homewall.png" alt="Kilter Wall" style="display: none;">
             </div>
-        </div>
-
-        <div class="wall-container">
-            <canvas id="wall-canvas"></canvas>
-            <img id="wall-image" src="zoomed_colored_7x10homewall.png" alt="Kilter Wall" style="display: none;">
         </div>
     </div>
 

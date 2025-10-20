@@ -209,7 +209,7 @@ class WallRenderer {
 
         // Draw thick red line
         this.ctx.strokeStyle = 'rgba(244, 67, 54, 0.9)'; // Red at 90% opacity
-        this.ctx.lineWidth = 15;
+        this.ctx.lineWidth = 10;
         this.ctx.lineCap = 'round';
 
         this.ctx.beginPath();

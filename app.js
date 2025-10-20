@@ -3,6 +3,87 @@
 let dataParser;
 let renderer;
 
+// Voice recognition
+let recognition = null;
+
+function setupVoiceRecognition() {
+    // Check if speech recognition is supported
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        console.log('Speech recognition not supported in this browser');
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+        const result = event.results[event.results.length - 1];
+        const transcript = result[0].transcript.toLowerCase().trim();
+
+        console.log('Heard:', transcript);
+
+        // Only process if the result is final
+        if (result.isFinal) {
+            // Try to extract a number or alphanumeric code (like D226)
+            const match = transcript.match(/\b([d]\s*)?(\d+)([a-z])?\b/i);
+
+            if (match) {
+                let holdNumber = '';
+
+                // Check if there's a 'D' prefix
+                if (match[1]) {
+                    holdNumber = 'D';
+                }
+
+                // Add the number
+                holdNumber += match[2];
+
+                // Check if there's a letter suffix (like B in D229B)
+                if (match[3]) {
+                    holdNumber += match[3].toUpperCase();
+                }
+
+                console.log('Parsed hold number:', holdNumber);
+
+                // Update input and trigger search
+                const searchInput = document.getElementById('hold-search');
+                searchInput.value = holdNumber;
+                handleSearch();
+            }
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech') {
+            // Ignore no-speech errors, just keep listening
+            return;
+        }
+    };
+
+    recognition.onend = () => {
+        // Automatically restart recognition when it ends
+        console.log('Recognition ended, restarting...');
+        try {
+            recognition.start();
+        } catch (e) {
+            console.log('Recognition already started');
+        }
+    };
+
+    // Start recognition
+    try {
+        recognition.start();
+        console.log('Voice recognition started');
+    } catch (e) {
+        console.error('Failed to start recognition:', e);
+    }
+}
+
 // Initialize the application
 async function init() {
     try {
@@ -21,6 +102,9 @@ async function init() {
         const searchInput = document.getElementById('hold-search');
         searchInput.value = '1350';
         handleSearch();
+
+        // Set up voice recognition
+        setupVoiceRecognition();
 
         console.log('Application initialized successfully');
     } catch (error) {

@@ -18,8 +18,9 @@ function speakHoldInfo(holdNumber) {
     // Get relative position
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
-    // Build the speech text (excluding angle)
+    // Build the speech text (including hold number, excluding angle)
     const textParts = [
+        `Hold ${holdNumber}`,
         `Panel: ${relativePos.panel}`,
         `Grid: ${relativePos.gridType}`,
         `Column: ${relativePos.columnText}`,
@@ -127,15 +128,15 @@ function setupVoiceRecognition() {
         }
     };
 
-    recognition.onend = () => {
-        // Automatically restart recognition when it ends
-        console.log('Recognition ended, restarting...');
-        try {
-            recognition.start();
-        } catch (e) {
-            console.log('Recognition already started');
-        }
-    };
+    // recognition.onend = () => {
+    //     // Automatically restart recognition when it ends
+    //     console.log('Recognition ended, restarting...');
+    //     try {
+    //         recognition.start();
+    //     } catch (e) {
+    //         console.log('Recognition already started');
+    //     }
+    // };
 
     // Start recognition
     try {

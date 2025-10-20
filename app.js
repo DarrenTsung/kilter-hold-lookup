@@ -30,15 +30,35 @@ function speakHoldInfo(holdNumber) {
 
     // Use Web Speech Synthesis API
     if ('speechSynthesis' in window) {
+        // Stop recognition while speaking to avoid interference
+        if (recognition) {
+            recognition.stop();
+        }
+
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.rate = 1.0;
+        utterance.rate = 0.9; // Slightly slower for clarity
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
         console.log('Speaking:', textToSpeak);
+
+        // Restart recognition after speaking
+        utterance.onend = () => {
+            console.log('Speech finished, restarting recognition');
+            if (recognition) {
+                setTimeout(() => {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.log('Recognition restart failed:', e);
+                    }
+                }, 500);
+            }
+        };
+
         window.speechSynthesis.speak(utterance);
     } else {
         console.log('Speech synthesis not supported');

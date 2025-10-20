@@ -7,6 +7,7 @@ let renderer;
 let recognition = null;
 let voices = [];
 let speechEnabled = false;
+let voiceModeActive = false;
 
 // Load voices
 function loadVoices() {
@@ -114,6 +115,7 @@ function speakHoldInfo(holdNumber) {
         });
 
         console.log('Speaking:', textToSpeak);
+        window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utterance);
     } else {
         console.log('Speech synthesis not supported');
@@ -220,8 +222,7 @@ async function init() {
         searchInput.value = '1350';
         handleSearch();
 
-        // Set up voice recognition
-        setupVoiceRecognition();
+        // Voice recognition will be started manually via the "Start Voice Mode" button
 
         console.log('Application initialized successfully');
     } catch (error) {
@@ -233,51 +234,34 @@ async function init() {
 function setupEventListeners() {
     const searchInput = document.getElementById('hold-search');
     const clearBtn = document.getElementById('clear-btn');
-    const testSpeechBtn = document.getElementById('test-speech-btn');
+    const voiceModeBtn = document.getElementById('voice-mode-btn');
 
     // Search on input
-    searchInput.addEventListener('input', () => {
-        enableSpeechSynthesis(); // Enable speech on first interaction
-        handleSearch();
-    });
+    searchInput.addEventListener('input', handleSearch);
 
     // Clear button
     clearBtn.addEventListener('click', clearSearch);
 
-    // Test speech button
-    testSpeechBtn.addEventListener('click', () => {
-        enableSpeechSynthesis(); // Enable speech on first interaction
-
-        const testText = 'Speech test. Panel TOP. Grid Mainline. Column 1 from the LEFT. Row 1 from the TOP.';
-        const utterance = new SpeechSynthesisUtterance(testText);
-
-        // Set preferred voice
-        const voice = getPreferredVoice();
-        if (voice) {
-            utterance.voice = voice;
-            console.log('Using voice:', voice.name, voice.lang);
+    // Voice mode button
+    voiceModeBtn.addEventListener('click', () => {
+        if (!voiceModeActive) {
+            // Enable voice mode
+            enableSpeechSynthesis();
+            setupVoiceRecognition();
+            voiceModeActive = true;
+            voiceModeBtn.textContent = 'Stop Voice Mode';
+            voiceModeBtn.style.backgroundColor = '#4CAF50';
+            console.log('Voice mode activated');
         } else {
-            console.warn('No voice available for test speech');
+            // Disable voice mode
+            if (recognition) {
+                recognition.stop();
+            }
+            voiceModeActive = false;
+            voiceModeBtn.textContent = 'Start Voice Mode';
+            voiceModeBtn.style.backgroundColor = '';
+            console.log('Voice mode deactivated');
         }
-
-        utterance.rate = 0.9;
-        utterance.volume = 1.0;
-
-        utterance.addEventListener('start', () => {
-            console.log('Test speech started');
-        });
-
-        utterance.addEventListener('end', () => {
-            console.log('Test speech ended');
-        });
-
-        utterance.addEventListener('error', (e) => {
-            console.error('Test speech error:', e);
-        });
-
-        console.log('Testing speech:', testText);
-        console.log('Available voices:', voices.length);
-        window.speechSynthesis.speak(utterance);
     });
 
     // Enter key
@@ -286,9 +270,6 @@ function setupEventListeners() {
             handleSearch();
         }
     });
-
-    // Enable speech synthesis on first click anywhere on the page
-    document.addEventListener('click', enableSpeechSynthesis, { once: true });
 }
 
 function handleSearch() {

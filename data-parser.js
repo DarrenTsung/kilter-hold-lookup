@@ -85,34 +85,57 @@ class DataParser {
     }
 
     getRelativePosition(row, column) {
-        // Panel structure:
-        // Top panel (9 rows): R-35, R-34, R-33, R-32, R-31, R-30, R-29, R-28, R-27
-        // Middle panel (10 rows): R-26, R-25, R-24, R-23, R-22, R-21, R-20, R-19, R-18, R-17
-        // Bottom panel (10 rows): R-16, R-15, R-14, R-13, R-12, R-11, R-10, R-9, R-8, R-7
+        // Determine grid type based on column (odd = mainline, even = aux)
+        const colNum = parseInt(column.replace('C-', ''));
+        const isMainline = colNum % 2 === 1;
+        const gridType = isMainline ? 'MAINLINE' : 'AUX';
 
-        const topPanel = ['R-35', 'R-34', 'R-33', 'R-32', 'R-31', 'R-30', 'R-29', 'R-28', 'R-27'];
-        const middlePanel = ['R-26', 'R-25', 'R-24', 'R-23', 'R-22', 'R-21', 'R-20', 'R-19', 'R-18', 'R-17'];
-        const bottomPanel = ['R-16', 'R-15', 'R-14', 'R-13', 'R-12', 'R-11', 'R-10', 'R-9', 'R-8', 'R-7'];
+        // Panel and row definitions separated by grid type
+        const panels = {
+            mainline: {
+                top: ['R-35', 'R-33', 'R-31', 'R-29', 'R-27'],
+                middle: ['R-25', 'R-23', 'R-21', 'R-19', 'R-17'],
+                bottom: ['R-15', 'R-13', 'R-11', 'R-9', 'R-7']
+            },
+            aux: {
+                top: ['R-34', 'R-32', 'R-30', 'R-28'],
+                middle: ['R-26', 'R-24', 'R-22', 'R-20', 'R-18'],
+                bottom: ['R-16', 'R-14', 'R-12', 'R-10', 'R-8']
+            }
+        };
 
+        // Find which panel this row belongs to
+        const gridPanels = isMainline ? panels.mainline : panels.aux;
         let panel = '';
         let relativeRowNumber = 0;
 
-        if (topPanel.includes(row)) {
+        if (gridPanels.top.includes(row)) {
             panel = 'Top';
-            relativeRowNumber = topPanel.indexOf(row) + 1;
-        } else if (middlePanel.includes(row)) {
+            relativeRowNumber = gridPanels.top.indexOf(row) + 1;
+        } else if (gridPanels.middle.includes(row)) {
             panel = 'Middle';
-            relativeRowNumber = middlePanel.indexOf(row) + 1;
-        } else if (bottomPanel.includes(row)) {
+            relativeRowNumber = gridPanels.middle.indexOf(row) + 1;
+        } else if (gridPanels.bottom.includes(row)) {
             panel = 'Bottom';
-            relativeRowNumber = bottomPanel.indexOf(row) + 1;
+            relativeRowNumber = gridPanels.bottom.indexOf(row) + 1;
         }
 
-        // Calculate column position (C-1 -> 1, C-2 -> 2, etc.)
-        const colNum = parseInt(column.replace('C-', ''));
-        const totalColumns = 21;
-        const fromLeft = colNum;
-        const fromRight = totalColumns - colNum + 1;
+        // Calculate column position within the grid
+        // Mainline: C-1, C-3, C-5, ..., C-21 (11 columns)
+        // Aux: C-2, C-4, C-6, ..., C-20 (10 columns)
+        let columnPosition;
+        let totalColumnsInGrid;
+
+        if (isMainline) {
+            columnPosition = Math.floor(colNum / 2) + 1; // C-1->1, C-3->2, C-5->3, etc.
+            totalColumnsInGrid = 11;
+        } else {
+            columnPosition = Math.floor(colNum / 2); // C-2->1, C-4->2, C-6->3, etc.
+            totalColumnsInGrid = 10;
+        }
+
+        const fromLeft = columnPosition;
+        const fromRight = totalColumnsInGrid - columnPosition + 1;
 
         // Use the smaller number
         let columnText;
@@ -124,6 +147,7 @@ class DataParser {
 
         return {
             panel: panel,
+            gridType: gridType,
             rowText: `${relativeRowNumber} from the top`,
             columnText: columnText
         };

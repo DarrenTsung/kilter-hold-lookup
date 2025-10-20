@@ -17,6 +17,11 @@ async function init() {
         // Set up event listeners
         setupEventListeners();
 
+        // Set default hold and trigger search
+        const searchInput = document.getElementById('hold-search');
+        searchInput.value = '1350';
+        handleSearch();
+
         console.log('Application initialized successfully');
     } catch (error) {
         console.error('Failed to initialize application:', error);

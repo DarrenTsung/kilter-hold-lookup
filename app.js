@@ -77,7 +77,7 @@ function displayHoldInfo(holdInfo) {
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
     angleDisplay.textContent = `Angle: ${holdInfo.angle}`;
-    positionDisplay.textContent = `Position: ${relativePos.column}, ${relativePos.row}`;
+    positionDisplay.textContent = `Panel: ${relativePos.panel} | Position: ${relativePos.column}, ${relativePos.row}`;
 }
 
 function showError(message) {

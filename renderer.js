@@ -124,6 +124,9 @@ class WallRenderer {
 
         // Draw circle at intersection
         this.drawIntersectionCircle(x, y);
+
+        // Draw angle indicator
+        this.drawAngleIndicator(x, y, holdInfo.angle);
     }
 
     drawColumnHighlight(x, y, column) {
@@ -189,23 +192,30 @@ class WallRenderer {
         this.ctx.stroke();
     }
 
-    drawHoldMarker(x, y) {
-        // Draw outer glow
-        this.ctx.shadowColor = 'rgba(244, 67, 54, 0.8)';
-        this.ctx.shadowBlur = 20;
+    drawAngleIndicator(x, y, angleString) {
+        // Parse angle from string (e.g., "215˚" -> 215)
+        const angle = parseFloat(angleString);
+        if (isNaN(angle)) return;
 
-        // Draw red circle
-        this.ctx.fillStyle = 'rgba(244, 67, 54, 0.7)';
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 25, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Convert to radians (subtract 90 to start from top, canvas 0° = right)
+        const angleRad = ((angle - 90) * Math.PI) / 180;
 
-        // Draw white center
-        this.ctx.shadowBlur = 0;
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        // Line length
+        const length = 100;
+
+        // Calculate end point
+        const endX = x + length * Math.cos(angleRad);
+        const endY = y + length * Math.sin(angleRad);
+
+        // Draw thick red line
+        this.ctx.strokeStyle = 'rgba(244, 67, 54, 0.9)'; // Red at 90% opacity
+        this.ctx.lineWidth = 15;
+        this.ctx.lineCap = 'round';
+
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 8, 0, Math.PI * 2);
-        this.ctx.fill();
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
     }
 
     clear() {

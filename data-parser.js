@@ -47,7 +47,8 @@ class DataParser {
                 const angleRow = i + 1 < lines.length ? this.parseRow(lines[i + 1]) : [];
 
                 // Extract the row label (e.g., "R-34")
-                const rowLabel = holdRow[holdRow.length - 1];
+                // Row label is at index 11 (after 10 data columns + first label column)
+                const rowLabel = holdRow[columns.length + 1];
 
                 // Process each hold in this row
                 for (let colIndex = 0; colIndex < columns.length; colIndex++) {

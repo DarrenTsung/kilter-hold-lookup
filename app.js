@@ -73,10 +73,10 @@ function speakHoldInfo(holdNumber) {
     // Build the speech text (including hold number, excluding angle)
     const textParts = [
         `Hold ${holdNumber}`,
-        `Panel: ${relativePos.panel}`,
-        `Grid: ${relativePos.gridType}`,
-        `Column: ${relativePos.columnText}`,
-        `Row: ${relativePos.rowText}`
+        `${relativePos.panel} Panel`,
+        `${relativePos.gridType}..`,
+        `${relativePos.columnText}..`,
+        `${relativePos.rowText}.`
     ];
 
     const textToSpeak = textParts.join('. ') + '.';

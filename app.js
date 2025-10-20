@@ -3,8 +3,47 @@
 let dataParser;
 let renderer;
 
-// Voice recognition
+// Voice recognition and speech synthesis
 let recognition = null;
+
+function speakHoldInfo(holdNumber) {
+    // Check if hold exists
+    const holdInfo = dataParser.findHold(holdNumber);
+
+    if (!holdInfo) {
+        console.log('Hold not found, not speaking');
+        return;
+    }
+
+    // Get relative position
+    const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
+
+    // Build the speech text (excluding angle)
+    const textParts = [
+        `Panel: ${relativePos.panel}`,
+        `Grid: ${relativePos.gridType}`,
+        `Column: ${relativePos.columnText}`,
+        `Row: ${relativePos.rowText}`
+    ];
+
+    const textToSpeak = textParts.join('. ') + '.';
+
+    // Use Web Speech Synthesis API
+    if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        console.log('Speaking:', textToSpeak);
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.log('Speech synthesis not supported');
+    }
+}
 
 function setupVoiceRecognition() {
     // Check if speech recognition is supported
@@ -53,6 +92,9 @@ function setupVoiceRecognition() {
                 const searchInput = document.getElementById('hold-search');
                 searchInput.value = holdNumber;
                 handleSearch();
+
+                // If hold was found, speak the information
+                speakHoldInfo(holdNumber);
             }
         }
     };

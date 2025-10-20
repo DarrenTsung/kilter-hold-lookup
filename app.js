@@ -70,14 +70,16 @@ function handleSearch() {
 }
 
 function displayHoldInfo(holdInfo) {
-    const angleDisplay = document.getElementById('angle-display');
+    const panelDisplay = document.getElementById('panel-display');
     const positionDisplay = document.getElementById('position-display');
+    const angleDisplay = document.getElementById('angle-display');
 
     // Get relative position within the panel
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
+    panelDisplay.textContent = `Panel: ${relativePos.panel}`;
+    positionDisplay.textContent = `Position: ${relativePos.column}, ${relativePos.row}`;
     angleDisplay.textContent = `Angle: ${holdInfo.angle}`;
-    positionDisplay.textContent = `Panel: ${relativePos.panel} | Position: ${relativePos.column}, ${relativePos.row}`;
 }
 
 function showError(message) {
@@ -86,8 +88,9 @@ function showError(message) {
 }
 
 function clearDisplay() {
-    document.getElementById('angle-display').textContent = '';
+    document.getElementById('panel-display').textContent = '';
     document.getElementById('position-display').textContent = '';
+    document.getElementById('angle-display').textContent = '';
     document.getElementById('error-message').textContent = '';
 }
 

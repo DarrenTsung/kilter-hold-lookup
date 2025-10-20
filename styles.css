@@ -81,8 +81,8 @@ body {
 }
 
 .info-display {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
@@ -95,6 +95,10 @@ body {
     min-height: 42px;
     display: flex;
     align-items: center;
+}
+
+#error-message {
+    grid-column: 1 / -1;
 }
 
 .error {

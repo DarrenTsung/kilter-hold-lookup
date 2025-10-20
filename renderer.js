@@ -94,53 +94,28 @@ class WallRenderer {
 
         // Draw row highlight (horizontal line)
         this.drawRowHighlight(x, y);
-
-        // Draw hold position marker
-        this.drawHoldMarker(x, y);
     }
 
     drawColumnHighlight(x, y) {
-        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.3)'; // Yellow at 30% opacity
-        this.ctx.lineWidth = 8;
+        this.ctx.strokeStyle = 'rgba(255, 235, 59, 0.4)'; // Yellow at 40% opacity
+        this.ctx.lineWidth = 30;
 
-        // Draw vertical line with circular cutout at intersection
-        this.ctx.save();
-
-        // Create clipping path that excludes a circle at the intersection
-        this.ctx.beginPath();
-        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
-        this.ctx.clip();
-
-        // Draw the line
+        // Draw vertical line
         this.ctx.beginPath();
         this.ctx.moveTo(x, 0);
         this.ctx.lineTo(x, this.canvas.height);
         this.ctx.stroke();
-
-        this.ctx.restore();
     }
 
     drawRowHighlight(x, y) {
-        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.3)'; // Blue at 30% opacity
-        this.ctx.lineWidth = 8;
+        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.4)'; // Blue at 40% opacity
+        this.ctx.lineWidth = 30;
 
-        // Draw horizontal line with circular cutout at intersection
-        this.ctx.save();
-
-        // Create clipping path that excludes a circle at the intersection
-        this.ctx.beginPath();
-        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.arc(x, y, 35, 0, Math.PI * 2, true); // Cutout circle, counter-clockwise
-        this.ctx.clip();
-
-        // Draw the line
+        // Draw horizontal line
         this.ctx.beginPath();
         this.ctx.moveTo(0, y);
         this.ctx.lineTo(this.canvas.width, y);
         this.ctx.stroke();
-
-        this.ctx.restore();
     }
 
     drawHoldMarker(x, y) {

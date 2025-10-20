@@ -84,11 +84,11 @@ function displayHoldInfo(holdInfo) {
     // Get relative position within the panel
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
-    panelDisplay.textContent = `Panel: ${relativePos.panel}`;
-    gridDisplay.textContent = `Grid: ${relativePos.gridType}`;
-    columnDisplay.textContent = `Column: ${relativePos.columnText}`;
-    rowDisplay.textContent = `Row: ${relativePos.rowText}`;
-    angleDisplay.textContent = `Angle: ${holdInfo.angle}`;
+    panelDisplay.textContent = relativePos.panel;
+    gridDisplay.textContent = relativePos.gridType;
+    columnDisplay.textContent = relativePos.columnText;
+    rowDisplay.textContent = relativePos.rowText;
+    angleDisplay.textContent = holdInfo.angle;
 }
 
 function showError(message) {

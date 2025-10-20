@@ -6,6 +6,7 @@ let renderer;
 // Voice recognition and speech synthesis
 let recognition = null;
 let voices = [];
+let speechEnabled = false;
 
 // Load voices
 function loadVoices() {
@@ -33,6 +34,19 @@ function getPreferredVoice() {
     }
 
     return null;
+}
+
+// Prime speech synthesis with a user gesture to enable it for later use
+function enableSpeechSynthesis() {
+    if (speechEnabled) return;
+
+    // Speak a silent utterance to prime the API
+    const utterance = new SpeechSynthesisUtterance('');
+    utterance.volume = 0;
+    window.speechSynthesis.speak(utterance);
+
+    speechEnabled = true;
+    console.log('Speech synthesis enabled');
 }
 
 // Wait for voices to load
@@ -222,13 +236,18 @@ function setupEventListeners() {
     const testSpeechBtn = document.getElementById('test-speech-btn');
 
     // Search on input
-    searchInput.addEventListener('input', handleSearch);
+    searchInput.addEventListener('input', () => {
+        enableSpeechSynthesis(); // Enable speech on first interaction
+        handleSearch();
+    });
 
     // Clear button
     clearBtn.addEventListener('click', clearSearch);
 
     // Test speech button
     testSpeechBtn.addEventListener('click', () => {
+        enableSpeechSynthesis(); // Enable speech on first interaction
+
         const testText = 'Speech test. Panel TOP. Grid Mainline. Column 1 from the LEFT. Row 1 from the TOP.';
         const utterance = new SpeechSynthesisUtterance(testText);
 
@@ -267,6 +286,9 @@ function setupEventListeners() {
             handleSearch();
         }
     });
+
+    // Enable speech synthesis on first click anywhere on the page
+    document.addEventListener('click', enableSpeechSynthesis, { once: true });
 }
 
 function handleSearch() {

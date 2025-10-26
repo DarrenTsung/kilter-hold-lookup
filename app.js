@@ -72,11 +72,11 @@ function speakHoldInfo(holdNumber) {
 
     // Build the speech text (including hold number, excluding angle)
     const textParts = [
-        `Hold ${holdNumber}`,
+        `${relativePos.gridType}`,
         `${relativePos.panel} Panel`,
-        `${relativePos.gridType}..`,
-        `${relativePos.columnText}..`,
-        `${relativePos.rowText}.`
+        `${holdNumber}`,
+        // `${relativePos.columnText}..`,
+        // `${relativePos.rowText}.`
     ];
 
     const textToSpeak = textParts.join('. ') + '.';
@@ -97,7 +97,7 @@ function speakHoldInfo(holdNumber) {
             console.warn('No voice available for speech');
         }
 
-        utterance.rate = 0.9;
+        utterance.rate = 1.2;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
@@ -132,8 +132,8 @@ function setupVoiceRecognition() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    // recognition.continuous = true;
+    // recognition.interimResults = true;
     recognition.lang = 'en-US';
 
     recognition.onresult = (event) => {
@@ -144,8 +144,11 @@ function setupVoiceRecognition() {
 
         // Only process if the result is final
         if (result.isFinal) {
+            // Remove all spaces to handle speech like "1 2 3 1" -> "1231"
+            const normalized = transcript.replace(/\s+/g, '');
+
             // Try to extract a number or alphanumeric code (like D226)
-            const match = transcript.match(/\b([d]\s*)?(\d+)([a-z])?\b/i);
+            const match = normalized.match(/\b([d])?(\d+)([a-z])?\b/i);
 
             if (match) {
                 let holdNumber = '';

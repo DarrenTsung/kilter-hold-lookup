@@ -83,6 +83,16 @@ function speakHoldInfo(holdNumber) {
 
     // Use Web Speech Synthesis API
     if ('speechSynthesis' in window) {
+        // Stop recognition while speaking to avoid feedback loop
+        if (recognition && voiceModeActive) {
+            try {
+                recognition.stop();
+                console.log('Recognition stopped for speech output');
+            } catch (e) {
+                console.log('Could not stop recognition:', e.message);
+            }
+        }
+
         // Cancel any ongoing speech
         window.speechSynthesis.cancel();
 
@@ -108,10 +118,32 @@ function speakHoldInfo(holdNumber) {
 
         utterance.addEventListener('end', (e) => {
             console.log('Speech finished');
+            // Restart recognition after speaking
+            if (voiceModeActive && recognition) {
+                setTimeout(() => {
+                    try {
+                        recognition.start();
+                        console.log('Recognition restarted after speech');
+                    } catch (e) {
+                        console.log('Could not restart recognition:', e.message);
+                    }
+                }, 200);
+            }
         });
 
         utterance.addEventListener('error', (e) => {
             console.error('Speech error:', e);
+            // Restart recognition even on error
+            if (voiceModeActive && recognition) {
+                setTimeout(() => {
+                    try {
+                        recognition.start();
+                        console.log('Recognition restarted after speech error');
+                    } catch (e) {
+                        console.log('Could not restart recognition:', e.message);
+                    }
+                }, 200);
+            }
         });
 
         console.log('Speaking:', textToSpeak);
@@ -144,11 +176,11 @@ function setupVoiceRecognition() {
 
         // Only process if the result is final
         if (result.isFinal) {
-            // Remove all spaces to handle speech like "1 2 3 1" -> "1231"
-            const normalized = transcript.replace(/\s+/g, '');
+            // Remove all non-alphanumeric characters to handle speech like "hold 1 2 3 1" -> "hold1231" -> extract "1231"
+            const normalized = transcript.replace(/[^a-z0-9]/gi, '');
 
             // Try to extract a number or alphanumeric code (like D226)
-            const match = normalized.match(/\b([d])?(\d+)([a-z])?\b/i);
+            const match = normalized.match(/([d])?(\d+)([a-z])?/i);
 
             if (match) {
                 let holdNumber = '';
@@ -190,20 +222,6 @@ function setupVoiceRecognition() {
         if (event.error === 'no-speech') {
             // Ignore no-speech errors, just keep listening
             return;
-        }
-    };
-
-    recognition.onend = () => {
-        // Automatically restart recognition when it ends (only if voice mode is still active)
-        if (voiceModeActive) {
-            console.log('Recognition ended, restarting...');
-            setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.log('Could not restart recognition:', e.message);
-                }
-            }, 100); // Small delay to avoid conflicts
         }
     };
 

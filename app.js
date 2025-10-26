@@ -193,15 +193,19 @@ function setupVoiceRecognition() {
         }
     };
 
-    // recognition.onend = () => {
-    //     // Automatically restart recognition when it ends
-    //     console.log('Recognition ended, restarting...');
-    //     try {
-    //         recognition.start();
-    //     } catch (e) {
-    //         console.log('Recognition already started');
-    //     }
-    // };
+    recognition.onend = () => {
+        // Automatically restart recognition when it ends (only if voice mode is still active)
+        if (voiceModeActive) {
+            console.log('Recognition ended, restarting...');
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.log('Could not restart recognition:', e.message);
+                }
+            }, 100); // Small delay to avoid conflicts
+        }
+    };
 
     // Start recognition
     try {

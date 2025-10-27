@@ -212,6 +212,17 @@ function setupVoiceRecognition() {
                     speakHoldInfo(holdNumber);
                 } else {
                     console.log('Hold not found, ignoring:', holdNumber);
+                    // Restart recognition immediately so user can try again
+                    if (voiceModeActive && recognition) {
+                        setTimeout(() => {
+                            try {
+                                recognition.start();
+                                console.log('Recognition restarted after hold not found');
+                            } catch (e) {
+                                console.log('Could not restart recognition:', e.message);
+                            }
+                        }, 100);
+                    }
                 }
             }
         }

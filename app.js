@@ -78,9 +78,11 @@ function speakHoldInfo(holdNumber) {
     ];
     if (relativePos.gridType !== 'Main') {
         textParts = ['Wrong grid, should be Main']
+        console.log('Wrong grid, should be Main, got', relativePos.gridType);
     }
     if (relativePos.panel !== 'Bottom') {
         textParts = ['Wrong panel, should be Bottom'];
+        console.log('Wrong panel, should be Bottom, got', relativePos.panel);
     }
 
     const textToSpeak = textParts.join('. ') + '.';
@@ -90,7 +92,7 @@ function speakHoldInfo(holdNumber) {
         // Stop recognition while speaking to avoid feedback loop
         if (recognition && voiceModeActive) {
             try {
-                recognition.stop();
+                recognition.abort();
                 console.log('Recognition stopped for speech output');
             } catch (e) {
                 console.log('Could not stop recognition:', e.message);
@@ -124,6 +126,7 @@ function speakHoldInfo(holdNumber) {
             console.log('Speech finished');
             // Restart recognition after speaking
             if (voiceModeActive && recognition) {
+                recognition.abort();
                 setTimeout(() => {
                     try {
                         recognition.start();
@@ -141,6 +144,7 @@ function speakHoldInfo(holdNumber) {
             if (voiceModeActive && recognition) {
                 setTimeout(() => {
                     try {
+                        recognition.abort();
                         recognition.start();
                         console.log('Recognition restarted after speech error');
                     } catch (e) {
@@ -220,6 +224,7 @@ function setupVoiceRecognition() {
                     if (voiceModeActive && recognition) {
                         setTimeout(() => {
                             try {
+                                recognition.abort();
                                 recognition.start();
                                 console.log('Recognition restarted after hold not found');
                             } catch (e) {
@@ -301,7 +306,7 @@ function setupEventListeners() {
         } else {
             // Disable voice mode
             if (recognition) {
-                recognition.stop();
+                recognition.abort();
             }
             voiceModeActive = false;
             voiceModeBtn.textContent = 'Start Voice Mode';

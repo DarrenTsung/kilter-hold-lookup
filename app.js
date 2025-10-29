@@ -71,13 +71,17 @@ function speakHoldInfo(holdNumber) {
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
     // Build the speech text (including hold number, excluding angle)
-    const textParts = [
-        `${relativePos.gridType}`,
-        `${relativePos.panel} Panel`,
+    let textParts = [
         `${holdNumber}`,
-        // `${relativePos.columnText}..`,
-        // `${relativePos.rowText}.`
+        `${relativePos.columnText}..`,
+        `${relativePos.rowText}.`
     ];
+    if (relativePos.gridType !== 'Main') {
+        textParts = ['Wrong grid, should be Main']
+    }
+    if (relativePos.panel !== 'Bottom') {
+        textParts = ['Wrong panel, should be Bottom'];
+    }
 
     const textToSpeak = textParts.join('. ') + '.';
 

@@ -108,16 +108,31 @@ class DataParser {
         const gridPanels = isMainline ? panels.mainline : panels.aux;
         let panel = '';
         let relativeRowNumber = 0;
+        let totalRowsInPanel = 0;
 
         if (gridPanels.top.includes(row)) {
-            panel = 'TOP';
+            panel = 'Top';
             relativeRowNumber = gridPanels.top.indexOf(row) + 1;
+            totalRowsInPanel = gridPanels.top.length;
         } else if (gridPanels.middle.includes(row)) {
-            panel = 'MIDDLE';
+            panel = 'Middle';
             relativeRowNumber = gridPanels.middle.indexOf(row) + 1;
+            totalRowsInPanel = gridPanels.middle.length;
         } else if (gridPanels.bottom.includes(row)) {
-            panel = 'BOTTOM';
+            panel = 'Bottom';
             relativeRowNumber = gridPanels.bottom.indexOf(row) + 1;
+            totalRowsInPanel = gridPanels.bottom.length;
+        }
+
+        // Calculate row position - from top or bottom, whichever is closer
+        const fromTop = relativeRowNumber;
+        const fromBottom = totalRowsInPanel - relativeRowNumber + 1;
+
+        let rowText;
+        if (fromTop <= fromBottom) {
+            rowText = `${fromTop} from the TOP`;
+        } else {
+            rowText = `${fromBottom} from the BOTTOM`;
         }
 
         // Calculate column position within the grid
@@ -148,7 +163,7 @@ class DataParser {
         return {
             panel: panel,
             gridType: gridType,
-            rowText: `${relativeRowNumber} from the TOP`,
+            rowText: rowText,
             columnText: columnText
         };
     }

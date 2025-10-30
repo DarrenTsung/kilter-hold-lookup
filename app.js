@@ -80,9 +80,9 @@ function speakHoldInfo(holdNumber) {
         textParts = ['Wrong grid, should be Main']
         console.log('Wrong grid, should be Main, got', relativePos.gridType);
     }
-    if (relativePos.panel !== 'Bottom') {
-        textParts = ['Wrong panel, should be Bottom'];
-        console.log('Wrong panel, should be Bottom, got', relativePos.panel);
+    if (relativePos.panel !== 'Middle') {
+        textParts = ['Wrong panel, should be Middle'];
+        console.log('Wrong panel, should be Middle, got', relativePos.panel);
     }
 
     const textToSpeak = textParts.join('. ') + '.';
@@ -253,6 +253,21 @@ function setupVoiceRecognition() {
                     console.log('Could not restart recognition after error:', e.message);
                 }
             }, 200);
+        }
+    };
+
+    recognition.onend = () => {
+        console.log('Recognition ended');
+        // Automatically restart recognition if voice mode is still active
+        if (voiceModeActive && recognition) {
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                    console.log('Recognition restarted after ending');
+                } catch (e) {
+                    console.log('Could not restart recognition after ending:', e.message);
+                }
+            }, 100);
         }
     };
 

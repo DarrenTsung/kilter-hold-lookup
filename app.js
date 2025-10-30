@@ -172,8 +172,8 @@ function setupVoiceRecognition() {
     }
 
     recognition = new SpeechRecognition();
-    // recognition.continuous = true;
-    // recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = 'en-US';
 
     recognition.onresult = (event) => {
@@ -239,9 +239,20 @@ function setupVoiceRecognition() {
 
     recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
-        if (event.error === 'no-speech') {
-            // Ignore no-speech errors, just keep listening
+        if (event.error === 'aborted') {
             return;
+        }
+        // Restart recognition after other errors if voice mode is still active
+        if (voiceModeActive && recognition) {
+            recognition.abort();
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                    console.log('Recognition restarted after error:', event.error);
+                } catch (e) {
+                    console.log('Could not restart recognition after error:', e.message);
+                }
+            }, 200);
         }
     };
 

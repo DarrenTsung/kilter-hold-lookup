@@ -34,6 +34,8 @@ body {
     min-width: 350px;
     max-width: 400px;
     flex-shrink: 0;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
 }
 
 .search-container {
@@ -114,6 +116,71 @@ body {
     color: #ff6b6b;
     font-weight: 500;
     font-size: 1.2rem;
+}
+
+.voice-settings {
+    margin-top: 25px;
+}
+
+.voice-settings-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.voice-field-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.voice-field-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #333;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    border: 2px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.voice-field-list li.drag-over {
+    border-color: #4a9eff;
+    background: #3a3a3a;
+}
+
+.voice-field-list li.dragging {
+    opacity: 0.4;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #666;
+    font-size: 1.2rem;
+    user-select: none;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.voice-field-list label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.voice-field-list input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4a9eff;
+    cursor: pointer;
 }
 
 .wall-container {

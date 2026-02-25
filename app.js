@@ -58,6 +58,24 @@ if (window.speechSynthesis) {
     }
 }
 
+function getVoiceTextParts(holdNumber, holdInfo, relativePos) {
+    const fields = document.querySelectorAll('#voice-fields li');
+    const parts = [];
+    fields.forEach(li => {
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        if (!checkbox.checked) return;
+        switch (li.dataset.field) {
+            case 'holdNumber': parts.push(`${holdNumber}`); break;
+            case 'panel': parts.push(relativePos.panel); break;
+            case 'grid': parts.push(relativePos.gridType); break;
+            case 'column': parts.push(`${relativePos.columnText}..`); break;
+            case 'row': parts.push(`${relativePos.rowText}.`); break;
+            case 'angle': parts.push(holdInfo.angle); break;
+        }
+    });
+    return parts;
+}
+
 function speakHoldInfo(holdNumber) {
     // Check if hold exists
     const holdInfo = dataParser.findHold(holdNumber);
@@ -70,12 +88,8 @@ function speakHoldInfo(holdNumber) {
     // Get relative position
     const relativePos = dataParser.getRelativePosition(holdInfo.row, holdInfo.column);
 
-    // Build the speech text (including hold number, excluding angle)
-    let textParts = [
-        `${holdNumber}`,
-        `${relativePos.columnText}..`,
-        `${relativePos.rowText}.`
-    ];
+    // Build speech text from voice settings
+    let textParts = getVoiceTextParts(holdNumber, holdInfo, relativePos);
     if (relativePos.gridType !== 'Main') {
         textParts = ['Wrong grid, should be Main']
         console.log('Wrong grid, should be Main, got', relativePos.gridType);
@@ -294,6 +308,9 @@ async function init() {
         // Set up event listeners
         setupEventListeners();
 
+        // Set up voice output settings (drag-and-drop, localStorage)
+        setupVoiceSettings();
+
         // Set default hold and trigger search
         const searchInput = document.getElementById('hold-search');
         searchInput.value = '1350';
@@ -346,6 +363,112 @@ function setupEventListeners() {
         if (e.key === 'Enter') {
             handleSearch();
         }
+    });
+}
+
+// Voice settings: drag-and-drop reordering + localStorage persistence
+const VOICE_SETTINGS_KEY = 'voiceSettings';
+
+function setupVoiceSettings() {
+    loadVoiceSettings();
+    setupDragAndDrop();
+
+    // Save on checkbox change
+    document.getElementById('voice-fields').addEventListener('change', saveVoiceSettings);
+}
+
+function loadVoiceSettings() {
+    const saved = localStorage.getItem(VOICE_SETTINGS_KEY);
+    if (!saved) return;
+
+    try {
+        const settings = JSON.parse(saved);
+        const list = document.getElementById('voice-fields');
+        const items = Array.from(list.querySelectorAll('li'));
+
+        // Reorder DOM elements to match saved order
+        settings.order.forEach(field => {
+            const item = items.find(li => li.dataset.field === field);
+            if (item) list.appendChild(item);
+        });
+
+        // Restore checkbox states
+        list.querySelectorAll('li').forEach(li => {
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            const enabled = settings.enabled[li.dataset.field];
+            if (enabled !== undefined) {
+                checkbox.checked = enabled;
+            }
+        });
+    } catch (e) {
+        console.log('Could not load voice settings:', e.message);
+    }
+}
+
+function saveVoiceSettings() {
+    const items = document.querySelectorAll('#voice-fields li');
+    const order = [];
+    const enabled = {};
+    items.forEach(li => {
+        order.push(li.dataset.field);
+        enabled[li.dataset.field] = li.querySelector('input[type="checkbox"]').checked;
+    });
+    localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify({ order, enabled }));
+}
+
+function setupDragAndDrop() {
+    const list = document.getElementById('voice-fields');
+    let draggedItem = null;
+
+    list.addEventListener('dragstart', (e) => {
+        draggedItem = e.target.closest('li');
+        if (!draggedItem) return;
+        draggedItem.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    });
+
+    list.addEventListener('dragend', () => {
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+            draggedItem = null;
+        }
+        list.querySelectorAll('li').forEach(li => li.classList.remove('drag-over'));
+    });
+
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.target.closest('li');
+        if (!target || target === draggedItem) return;
+
+        // Clear all drag-over indicators
+        list.querySelectorAll('li').forEach(li => li.classList.remove('drag-over'));
+        target.classList.add('drag-over');
+    });
+
+    list.addEventListener('dragleave', (e) => {
+        const target = e.target.closest('li');
+        if (target) target.classList.remove('drag-over');
+    });
+
+    list.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const target = e.target.closest('li');
+        if (!target || !draggedItem || target === draggedItem) return;
+
+        // Determine position: insert before or after target
+        const items = Array.from(list.querySelectorAll('li'));
+        const dragIdx = items.indexOf(draggedItem);
+        const targetIdx = items.indexOf(target);
+
+        if (dragIdx < targetIdx) {
+            list.insertBefore(draggedItem, target.nextSibling);
+        } else {
+            list.insertBefore(draggedItem, target);
+        }
+
+        list.querySelectorAll('li').forEach(li => li.classList.remove('drag-over'));
+        saveVoiceSettings();
     });
 }
 

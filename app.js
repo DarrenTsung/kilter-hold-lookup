@@ -90,13 +90,19 @@ function speakHoldInfo(holdNumber) {
 
     // Build speech text from voice settings
     let textParts = getVoiceTextParts(holdNumber, holdInfo, relativePos);
-    if (relativePos.gridType !== 'Main') {
-        textParts = ['Wrong grid, should be Main']
-        console.log('Wrong grid, should be Main, got', relativePos.gridType);
+
+    // Check against accepted grids
+    const acceptedGrids = getAcceptedValues('grid-filters');
+    if (!acceptedGrids.includes(relativePos.gridType)) {
+        textParts = [`Wrong grid, got ${relativePos.gridType}`];
+        console.log('Wrong grid, got', relativePos.gridType, 'accepted:', acceptedGrids);
     }
-    if (relativePos.panel !== 'Middle') {
-        textParts = ['Wrong panel, should be Middle'];
-        console.log('Wrong panel, should be Middle, got', relativePos.panel);
+
+    // Check against accepted panels
+    const acceptedPanels = getAcceptedValues('panel-filters');
+    if (!acceptedPanels.includes(relativePos.panel)) {
+        textParts = [`Wrong panel, got ${relativePos.panel}`];
+        console.log('Wrong panel, got', relativePos.panel, 'accepted:', acceptedPanels);
     }
 
     const textToSpeak = textParts.join('. ') + '.';
@@ -308,7 +314,8 @@ async function init() {
         // Set up event listeners
         setupEventListeners();
 
-        // Set up voice output settings (drag-and-drop, localStorage)
+        // Set up filter and voice output settings
+        setupFilterSettings();
         setupVoiceSettings();
 
         // Set default hold and trigger search
@@ -364,6 +371,49 @@ function setupEventListeners() {
             handleSearch();
         }
     });
+}
+
+// Filter settings: accepted panels and grids
+const FILTER_SETTINGS_KEY = 'filterSettings';
+
+function getAcceptedValues(containerId) {
+    const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+function setupFilterSettings() {
+    loadFilterSettings();
+
+    // Save on any checkbox change
+    document.getElementById('panel-filters').addEventListener('change', saveFilterSettings);
+    document.getElementById('grid-filters').addEventListener('change', saveFilterSettings);
+}
+
+function loadFilterSettings() {
+    const saved = localStorage.getItem(FILTER_SETTINGS_KEY);
+    if (!saved) return;
+
+    try {
+        const settings = JSON.parse(saved);
+        ['panel-filters', 'grid-filters'].forEach(containerId => {
+            const key = containerId === 'panel-filters' ? 'panels' : 'grids';
+            const accepted = settings[key];
+            if (!accepted) return;
+            document.querySelectorAll(`#${containerId} input[type="checkbox"]`).forEach(cb => {
+                cb.checked = accepted.includes(cb.value);
+            });
+        });
+    } catch (e) {
+        console.log('Could not load filter settings:', e.message);
+    }
+}
+
+function saveFilterSettings() {
+    const settings = {
+        panels: getAcceptedValues('panel-filters'),
+        grids: getAcceptedValues('grid-filters')
+    };
+    localStorage.setItem(FILTER_SETTINGS_KEY, JSON.stringify(settings));
 }
 
 // Voice settings: drag-and-drop reordering + localStorage persistence
